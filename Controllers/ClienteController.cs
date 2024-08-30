@@ -1,5 +1,4 @@
-﻿// Controllers/ClientesController.cs
-using GestaoEstoque.Models;
+﻿using GestaoEstoque.Models;
 using GestaoEstoque.Services;
 using Microsoft.AspNetCore.Mvc;
 
