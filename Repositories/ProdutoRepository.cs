@@ -1,8 +1,9 @@
 ﻿using GestaoEstoque.Data;
 using GestaoEstoque.Models;
+using GestaoEstoque.Repositórios;
 using Microsoft.EntityFrameworkCore;
 
-namespace GestaoEstoque.Repositórios
+namespace GestaoEstoque.Repositories
     {
     public class ProdutoRepository : IProdutoRepository
         {
@@ -32,15 +33,23 @@ namespace GestaoEstoque.Repositórios
 
         public async Task<Produto> UpdateAsync(Produto produto)
             {
-            _context.Produtos.Update(produto);
-            await _context.SaveChangesAsync();
-            return produto;
+            if(await _context.Produtos.AnyAsync(p => p.Id == produto.Id))
+                {
+                _context.Entry(produto).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                return produto;
+                }
+
+            return null;
             }
 
         public async Task<bool> DeleteAsync(int id)
             {
             var produto = await _context.Produtos.FindAsync(id);
-            if(produto == null) return false;
+            if(produto == null)
+                {
+                return false;
+                }
 
             _context.Produtos.Remove(produto);
             await _context.SaveChangesAsync();

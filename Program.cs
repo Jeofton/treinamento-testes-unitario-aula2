@@ -1,6 +1,7 @@
 
 using Gestao.Services;
 using GestaoEstoque.Data;
+using GestaoEstoque.Repositories;
 using GestaoEstoque.Repositórios;
 using GestaoEstoque.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,9 +21,10 @@ namespace GestaoEstoque
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("ProdutoDB")));
 
+            builder.Services.AddScoped<IProdutoService, ProdutoService>();
+            builder.Services.AddScoped<IClienteService, ClienteService>();
             builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
             builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
-            builder.Services.AddScoped<IClienteService, ClienteService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

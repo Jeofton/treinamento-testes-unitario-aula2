@@ -1,59 +1,72 @@
 ﻿using GestaoEstoque.Models;
-using GestaoEstoque.Repositórios;
+using GestaoEstoque.Services;
 using Microsoft.AspNetCore.Mvc;
 
-[ApiController]
-[Route("api/[controller]")]
-public class ProdutosController : ControllerBase
+namespace GestaoEstoque.Controllers
     {
-    private readonly IProdutoRepository _produtoRepository;
-
-    public ProdutosController(IProdutoRepository produtoRepository)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ProdutosController : ControllerBase
         {
-        _produtoRepository = produtoRepository;
-        }
+        private readonly IProdutoService _produtoService;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
-        {
-        var produtos = await _produtoRepository.GetAllAsync();
-        return Ok(produtos);
-        }
+        public ProdutosController(IProdutoService produtoService)
+            {
+            _produtoService = produtoService;
+            }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Produto>> GetProduto(int id)
-        {
-        var produto = await _produtoRepository.GetByIdAsync(id);
-        if(produto == null) return NotFound();
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
+            {
+            var produtos = await _produtoService.GetAllAsync();
+            return Ok(produtos);
+            }
 
-        return Ok(produto);
-        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Produto>> GetProduto(int id)
+            {
+            var produto = await _produtoService.GetByIdAsync(id);
+            if(produto == null)
+                {
+                return NotFound();
+                }
+            return Ok(produto);
+            }
 
-    [HttpPost]
-    public async Task<ActionResult<Produto>> AddProduto(Produto produto)
-        {
-        var novoProduto = await _produtoRepository.AddAsync(produto);
-        return CreatedAtAction(nameof(GetProduto), new { id = novoProduto.Id }, novoProduto);
-        }
+        [HttpPost]
+        public async Task<ActionResult<Produto>> AddProduto(Produto produto)
+            {
+            var novoProduto = await _produtoService.AddAsync(produto);
+            return CreatedAtAction(nameof(GetProduto), new { id = novoProduto.Id }, novoProduto);
+            }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduto(int id, Produto produto)
-        {
-        if(id != produto.Id) return BadRequest();
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateProduto(int id, Produto produto)
+            {
+            if(id != produto.Id)
+                {
+                return BadRequest();
+                }
 
-        var produtoExistente = await _produtoRepository.GetByIdAsync(id);
-        if(produtoExistente == null) return NotFound();
+            var produtoAtualizado = await _produtoService.UpdateAsync(produto);
+            if(produtoAtualizado == null)
+                {
+                return NotFound();
+                }
 
-        await _produtoRepository.UpdateAsync(produto);
-        return NoContent();
-        }
+            return NoContent();
+            }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteProduto(int id)
-        {
-        var sucesso = await _produtoRepository.DeleteAsync(id);
-        if(!sucesso) return NotFound();
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduto(int id)
+            {
+            var deleted = await _produtoService.DeleteAsync(id);
+            if(!deleted)
+                {
+                return NotFound();
+                }
 
-        return NoContent();
+            return NoContent();
+            }
         }
     }
